@@ -656,7 +656,12 @@ class AnnasArchieve {
               currentBaseUrl: instances.isEmpty ? baseUrl : instances.first.baseUrl,
             );
 
-        final html = await WebviewChallengeSolver.fetchHtmlAfterChallenge(targetUrl);
+        final html = await WebviewChallengeSolver.fetchHtmlAfterChallenge(
+          targetUrl,
+          // DDoS-Guard ties clearance cookies to the user agent that earned
+          // them, so the webview must present the same one Dio sends.
+          userAgent: defaultDioHeaders['user-agent'] as String?,
+        );
         if (html != null && html.length > 1000) {
           _logger.info('Challenge solved, parsing results from webview HTML',
               tag: 'AnnasArchive');
@@ -822,7 +827,12 @@ class AnnasArchieve {
             tag: 'AnnasArchive');
         
         final targetUrl = networkErr.blockedUrl ?? url;
-        final html = await WebviewChallengeSolver.fetchHtmlAfterChallenge(targetUrl);
+        final html = await WebviewChallengeSolver.fetchHtmlAfterChallenge(
+          targetUrl,
+          // DDoS-Guard ties clearance cookies to the user agent that earned
+          // them, so the webview must present the same one Dio sends.
+          userAgent: defaultDioHeaders['user-agent'] as String?,
+        );
         if (html != null && html.length > 1000) {
           _logger.info('Challenge solved, parsing bookInfo from webview HTML',
               tag: 'AnnasArchive');
