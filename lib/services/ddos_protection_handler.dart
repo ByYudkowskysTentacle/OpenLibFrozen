@@ -126,10 +126,21 @@ class DDoSProtectionHandler {
       if (cookieString.isNotEmpty) {
         final cookies = <Cookie>[];
         final pairs = cookieString.split(';');
-        for (var pair in pairs) {
-          final parts = pair.trim().split('=');
-          if (parts.length == 2) {
-            cookies.add(Cookie(parts[0], parts[1]));
+        for (final pair in pairs) {
+          final trimmed = pair.trim();
+          if (trimmed.isEmpty) continue;
+          // Split on the FIRST '=' only. Clearance cookie values are often
+          // base64 and carry '=' padding, which splitting on every '=' would
+          // drop on the way back out of storage.
+          final sep = trimmed.indexOf('=');
+          if (sep <= 0) continue;
+          try {
+            cookies.add(Cookie(
+              trimmed.substring(0, sep),
+              trimmed.substring(sep + 1),
+            ));
+          } catch (_) {
+            // Skip values dart:io refuses to represent.
           }
         }
         
